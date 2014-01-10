@@ -1,0 +1,143 @@
+package orderStat;
+
+import java.util.Arrays;
+
+public class KthMinimum {
+
+    public static void findKthLargest(int arr[], int k) 
+    {
+        if (k > arr.length) 
+        {
+            System.out.println(k + " th largest element does not exist");
+        } else 
+        {
+            System.out.print(k + " th largest element in the array is \n");
+            int kth = findKthLargestUtil(arr, 0, arr.length - 1, k);
+            System.out.println(kth);
+        }
+    }
+
+    private static int findKthLargestUtil(int arr[], int low, int high, int k) 
+    {
+        System.out.print("Finding " + k + " th largest in ");
+        printArray(arr, low, high);
+
+        if (low == high) {
+            return arr[low];
+        }
+        int rank = partition(arr, low, high);
+        int length = rank - low + 1;
+
+        if (length == k) {
+            return arr[rank];
+        } else if (k < length) {
+            return findKthLargestUtil(arr, low, rank - 1, k);
+        } else {
+            return findKthLargestUtil(arr, rank + 1, high, k - length);
+        }
+
+    }
+
+    private static int partition(int arr[], int low, int high) 
+    {
+        int pivot = KthMinimum.getPivotValue(arr, low, high);
+
+        while (low < high) 
+        {
+            while (arr[low] < pivot) 
+            {
+                low++;
+            }
+
+            while (arr[high] > pivot) 
+            {
+                high--;
+            }
+
+            if (arr[low] == arr[high]) 
+            {
+                low++;
+            }
+            else if (low < high) 
+            {
+                int tmp = arr[low];
+                arr[low] = arr[high];
+                arr[high] = tmp;
+            }
+        }
+
+        return high;
+    }
+
+    private static void swap(int arr[], int x, int y) 
+    {
+        int temp = arr[x];
+        arr[x] = arr[y];
+        arr[y] = temp;
+    }
+
+    private static void printArray(int arr[], int low, int high) 
+    {
+        System.out.print("[  ");
+        for (int i = low; i < high; i++) 
+        {
+            System.out.print(arr[i] + "  ");
+        }
+        System.out.println("]");
+    }
+
+    public static void main(String args[]) 
+    {
+        runRandomTest();
+    }
+
+    public static void runRandomTest() 
+    {
+        int nElements = 100;
+        int arr1[] = new int[nElements];
+
+        for (int i = 0; i < arr1.length; i++) {
+            arr1[i] = (int) (2000 * Math.random());
+        }
+
+        java.util.Random rand = new java.util.Random();
+        int k1 = nElements / 2; //rand.nextInt(nElements); // find third largest, which is 2
+
+        System.out.print("Array");
+        printArray(arr1, 0, arr1.length - 1);
+        System.out.println("k - " + k1);
+
+        KthMinimum.findKthLargest(arr1.clone(), k1);
+
+        java.util.Arrays.sort(arr1);
+        System.out.print(" Sorted Array - ");
+        printArray(arr1, 0, nElements - 1);
+        System.out.println("Kth largset using sorting - " + arr1[k1 - 1]);
+    }
+
+    private static int getPivotValue(int arr[], int low, int high) 
+    {
+        if (high - low + 1 <= 9) {
+            Arrays.sort(arr);
+            return arr[arr.length / 2];
+        }
+
+        int temp[] = null;
+        int medians[] = new int[(int) Math.ceil((double) (high - low + 1) / 5)];
+        int medianIndex = 0;
+
+        while (low <= high) {
+            temp = new int[Math.min(5, high - low + 1)];
+            for (int j = 0; j < temp.length && low <= high; j++) {
+                temp[j] = arr[low];
+                low++;
+            }
+
+            Arrays.sort(temp);
+            medians[medianIndex] = temp[temp.length / 2];
+            medianIndex++;
+        }
+
+        return getPivotValue(medians, 0, medians.length - 1);
+    }
+}
